@@ -1,0 +1,107 @@
+package ToDoList.ToDoList.service;
+
+import ToDoList.ToDoList.dto.TaskDto;
+import ToDoList.ToDoList.dto.mapping.TaskMapping;
+import ToDoList.ToDoList.entity.Task;
+import ToDoList.ToDoList.entity.User;
+import ToDoList.ToDoList.enums.TaskStatus;
+import ToDoList.ToDoList.exceptions.IllegalStatusFormatException;
+import ToDoList.ToDoList.exceptions.TaskNotFoundException;
+import ToDoList.ToDoList.repository.TaskRepository;
+import ToDoList.ToDoList.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@AllArgsConstructor
+public class TaskService {
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final TaskMapping taskMapping;
+
+    @Transactional
+    public Task addTask (Long userId, TaskDto taskDto) {
+        Task task = taskMapping.toTask(taskDto);
+        task.setUser(userRepository.getUserById(userId));
+        return taskRepository.save(task);
+    }
+
+    @Transactional
+    public List<TaskDto> findAllTasksByUserId(Long id) {
+        User user = userRepository.getUserById(id);
+        List<TaskDto> taskDtoList = user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
+        if (!taskDtoList.isEmpty()) {
+            return taskDtoList;
+        } else {
+            throw new TaskNotFoundException("Список задач пуст!");
+        }
+    }
+
+    @Transactional
+    public void deleteTaskById(Long taskId) {
+        taskRepository.delete(getTaskById(taskId));
+    }
+
+    @Transactional
+    public List<TaskDto> findAllByUserIdAndStatus (Long userId, TaskStatus taskStatus) {
+        User user = userRepository.getUserById(userId);
+        List<TaskDto> taskDtoList = user.getTaskList().stream().
+                filter(e -> e.getTaskStatus().equals(taskStatus)).
+                map(taskMapping::toTaskDto).toList();
+        if (!taskDtoList.isEmpty()) {
+            return taskDtoList;
+        } else {
+            throw new TaskNotFoundException("Задач со статусом " + taskStatus + " в списке нет.");
+        }
+    }
+
+    @Transactional
+    public TaskDto changeTaskName(Long taskId, String taskName) {
+        Task task = getTaskById(taskId);
+        task.setTaskName(taskName);
+        taskRepository.save(task);
+        return taskMapping.toTaskDto(task);
+    }
+
+    @Transactional
+    public TaskDto changeTaskDescription(Long taskId, String taskDescription) {
+        Task task = getTaskById(taskId);
+        task.setTaskDescription(taskDescription);
+        taskRepository.save(task);
+        return taskMapping.toTaskDto(task);
+    }
+
+    @Transactional
+    public TaskDto changeTaskStatus(Long taskId, String taskStatus) {
+        Task task = getTaskById(taskId);
+        try {
+            task.setTaskStatus(TaskStatus.valueOf(taskStatus));
+            taskRepository.save(task);
+            return taskMapping.toTaskDto(task);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStatusFormatException("Неверный формат статуса");
+        }
+    }
+
+    @Transactional
+    public TaskDto changeTaskDeadline(Long taskId, LocalDate deadline) {
+        Task task = getTaskById(taskId);
+        task.setTaskDeadline(deadline);
+        taskRepository.save(task);
+        return taskMapping.toTaskDto(task);
+    }
+
+    private Task getTaskById (Long id) {
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isPresent()) {
+            return task.get();
+        } else {
+            throw new TaskNotFoundException("Задача не найдена");
+        }
+    }
+}
