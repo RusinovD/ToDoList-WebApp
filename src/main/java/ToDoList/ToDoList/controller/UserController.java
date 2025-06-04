@@ -6,19 +6,20 @@ import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.exceptions.UserAlreadyExistException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.service.UserService;
+
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
-@AllArgsConstructor
+@RequestMapping("/v1/users")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
     private final UserService userService;
 
-    @PostMapping("/registration")
+    @PostMapping("/")
     public ResponseEntity registration (@RequestBody User user) {
         try {
             userService.registration(user);
@@ -30,7 +31,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity deleteUser (@PathVariable Long id) {
         try {
             userService.deleteUser(id);

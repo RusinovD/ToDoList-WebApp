@@ -6,21 +6,19 @@ import ToDoList.ToDoList.exceptions.IllegalStatusFormatException;
 import ToDoList.ToDoList.exceptions.TaskNotFoundException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.service.TaskService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/tasks/{id}")
-@AllArgsConstructor
+@RequestMapping("/v1/users/{id}/tasks")
+@RequiredArgsConstructor
 public class TaskController {
-    @Autowired
     private final TaskService taskService;
 
-    @PostMapping("/add")
+    @PostMapping("/")
     public ResponseEntity addTask (@PathVariable Long id,
                                    @RequestBody TaskDto taskDto) {
         try {
@@ -47,8 +45,8 @@ public class TaskController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity deleteTaskById (@RequestParam Long taskId) {
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity deleteTaskById (@PathVariable Long taskId) {
         try {
             taskService.deleteTaskById(taskId);
             return ResponseEntity.ok("Задача успешно удалена!");
@@ -59,9 +57,9 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/status")
     public ResponseEntity filterTasksByStatus (@PathVariable Long id,
-                                                   @RequestParam TaskStatus taskStatus) { //
+                                               @RequestParam TaskStatus taskStatus) { //
         try {
             return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(id, taskStatus));
         } catch (TaskNotFoundException e) {
@@ -71,7 +69,7 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/change-name")
+    @PatchMapping("/name")
     public ResponseEntity changeTaskName(@RequestParam Long taskId,
                                          @RequestBody String taskName) {
         try {
@@ -83,7 +81,7 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/change-description")
+    @PatchMapping("/description")
     public ResponseEntity changeTaskDescription(@RequestParam Long taskId,
                                                 @RequestBody String description) {
         try {
@@ -95,7 +93,7 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/change-status")
+    @PatchMapping("/status")
     public ResponseEntity changeTaskStatus(@RequestParam Long taskId,
                                            @RequestBody String taskStatus) {
         try {
@@ -107,7 +105,7 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/change-deadline")
+    @PatchMapping("/deadline")
     public ResponseEntity changeTaskDeadline(@RequestParam Long taskId,
                                              @RequestBody LocalDate deadline) {
         try {
