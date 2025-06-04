@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/v1/users/{id}/tasks")
+@RequestMapping("/v1/users/{userId}/tasks")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/")
-    public ResponseEntity addTask (@PathVariable Long id,
+    public ResponseEntity addTask (@PathVariable Long userId,
                                    @RequestBody TaskDto taskDto) {
         try {
-            taskService.addTask(id, taskDto);
+            taskService.addTask(userId, taskDto);
             return ResponseEntity.ok("Задача успешно добавлена!");
 
         } catch (UserNotFoundException e) {
@@ -33,9 +33,9 @@ public class TaskController {
     }
 
     @GetMapping("/")
-    public ResponseEntity getAllTasks (@PathVariable Long id) {
+    public ResponseEntity getAllTasks (@PathVariable Long userId) {
         try {
-            return ResponseEntity.ok(taskService.findAllTasksByUserId(id));
+            return ResponseEntity.ok(taskService.findAllTasksByUserId(userId));
         } catch (UserNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (TaskNotFoundException e) {
@@ -45,10 +45,11 @@ public class TaskController {
         }
     }
 
-    @DeleteMapping("/{taskId}")
-    public ResponseEntity deleteTaskById (@PathVariable Long taskId) {
+    @DeleteMapping("/")
+    public ResponseEntity deleteTaskById (@PathVariable Long userId,
+                                          @RequestParam Long taskId) {
         try {
-            taskService.deleteTaskById(taskId);
+            taskService.deleteTaskById(userId, taskId);
             return ResponseEntity.ok("Задача успешно удалена!");
         } catch (TaskNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -57,11 +58,11 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/status")
-    public ResponseEntity filterTasksByStatus (@PathVariable Long id,
+    @GetMapping("/filter")
+    public ResponseEntity filterTasksByStatus (@PathVariable Long userId,
                                                @RequestParam TaskStatus taskStatus) { //
         try {
-            return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(id, taskStatus));
+            return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(userId, taskStatus));
         } catch (TaskNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -70,10 +71,11 @@ public class TaskController {
     }
 
     @PatchMapping("/name")
-    public ResponseEntity changeTaskName(@RequestParam Long taskId,
+    public ResponseEntity changeTaskName(@PathVariable Long userId,
+                                         @RequestParam Long taskId,
                                          @RequestBody String taskName) {
         try {
-            return ResponseEntity.ok(taskService.changeTaskName(taskId, taskName));
+            return ResponseEntity.ok(taskService.changeTaskName(userId, taskId, taskName));
         } catch (TaskNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -82,10 +84,11 @@ public class TaskController {
     }
 
     @PatchMapping("/description")
-    public ResponseEntity changeTaskDescription(@RequestParam Long taskId,
+    public ResponseEntity changeTaskDescription(@PathVariable Long userId,
+                                                @RequestParam Long taskId,
                                                 @RequestBody String description) {
         try {
-            return ResponseEntity.ok(taskService.changeTaskDescription(taskId, description));
+            return ResponseEntity.ok(taskService.changeTaskDescription(userId, taskId, description));
         } catch (TaskNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -94,10 +97,11 @@ public class TaskController {
     }
 
     @PatchMapping("/status")
-    public ResponseEntity changeTaskStatus(@RequestParam Long taskId,
+    public ResponseEntity changeTaskStatus(@PathVariable Long userId,
+                                           @RequestParam Long taskId,
                                            @RequestBody String taskStatus) {
         try {
-            return ResponseEntity.ok(taskService.changeTaskStatus(taskId, taskStatus));
+            return ResponseEntity.ok(taskService.changeTaskStatus(userId, taskId, taskStatus));
         } catch (TaskNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -106,10 +110,11 @@ public class TaskController {
     }
 
     @PatchMapping("/deadline")
-    public ResponseEntity changeTaskDeadline(@RequestParam Long taskId,
+    public ResponseEntity changeTaskDeadline(@PathVariable Long userId,
+                                             @RequestParam Long taskId,
                                              @RequestBody LocalDate deadline) {
         try {
-            return ResponseEntity.ok(taskService.changeTaskDeadline(taskId, deadline));
+            return ResponseEntity.ok(taskService.changeTaskDeadline(userId, taskId, deadline));
         } catch (IllegalStatusFormatException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (TaskNotFoundException e) {

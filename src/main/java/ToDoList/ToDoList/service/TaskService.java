@@ -45,7 +45,8 @@ public class TaskService {
     }
 
     @Transactional
-    public void deleteTaskById(Long taskId) {
+    public void deleteTaskById(Long userId, Long taskId) {
+        User user = userRepository.getUserById(userId);
         taskRepository.delete(getTaskById(taskId));
     }
 
@@ -63,7 +64,8 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDto changeTaskName(Long taskId, String taskName) {
+    public TaskDto changeTaskName(Long userId, Long taskId, String taskName) {
+        User user = userRepository.getUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskName(taskName);
         taskRepository.save(task);
@@ -71,7 +73,8 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDto changeTaskDescription(Long taskId, String taskDescription) {
+    public TaskDto changeTaskDescription(Long userId, Long taskId, String taskDescription) {
+        User user = userRepository.getUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskDescription(taskDescription);
         taskRepository.save(task);
@@ -79,7 +82,8 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDto changeTaskStatus(Long taskId, String taskStatus) {
+    public TaskDto changeTaskStatus(Long userId, Long taskId, String taskStatus) {
+        User user = userRepository.getUserById(userId);
         Task task = getTaskById(taskId);
         try {
             task.setTaskStatus(TaskStatus.valueOf(taskStatus));
@@ -91,15 +95,16 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDto changeTaskDeadline(Long taskId, LocalDate deadline) {
+    public TaskDto changeTaskDeadline(Long userId, Long taskId, LocalDate deadline) {
+        User user = userRepository.getUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskDeadline(deadline);
         taskRepository.save(task);
         return taskMapping.toTaskDto(task);
     }
 
-    private Task getTaskById (Long id) {
-        Optional<Task> task = taskRepository.findById(id);
+    private Task getTaskById (Long taskId) {
+        Optional<Task> task = taskRepository.findById(taskId);
         if (task.isPresent()) {
             return task.get();
         } else {
