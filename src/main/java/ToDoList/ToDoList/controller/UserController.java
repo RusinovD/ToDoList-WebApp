@@ -6,16 +6,15 @@ import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.exceptions.UserAlreadyExistException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.service.UserService;
-
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 

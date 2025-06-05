@@ -8,6 +8,7 @@ import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/v1/users/{userId}/tasks")
 @RequiredArgsConstructor
+@Validated
 public class TaskController {
     private final TaskService taskService;
 

@@ -4,6 +4,7 @@ import ToDoList.ToDoList.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -17,6 +18,7 @@ public class Task {
     private long id;
 
     @Column(name = "name", nullable = false)
+    @NotBlank
     private String taskName;
 
     @Column(name = "description", nullable = false)

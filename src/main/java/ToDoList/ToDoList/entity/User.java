@@ -3,8 +3,8 @@ package ToDoList.ToDoList.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "users")
@@ -16,9 +16,11 @@ public class User {
     private long id;
 
     @Column(name = "name", nullable = false)
+    @NotBlank
     private String userName;
 
     @Column(name = "email", nullable = false)
+    @Email
     private String userEmail;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
