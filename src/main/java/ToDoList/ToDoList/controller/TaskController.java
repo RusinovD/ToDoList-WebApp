@@ -28,7 +28,7 @@ public class TaskController {
             return ResponseEntity.ok("Задача успешно добавлена!");
 
         } catch (UserNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -39,9 +39,7 @@ public class TaskController {
         try {
             return ResponseEntity.ok(taskService.findAllTasksByUserId(userId));
         } catch (UserNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -53,8 +51,8 @@ public class TaskController {
         try {
             taskService.deleteTaskById(userId, taskId);
             return ResponseEntity.ok("Задача успешно удалена!");
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -65,8 +63,8 @@ public class TaskController {
                                                @RequestParam TaskStatus taskStatus) { //
         try {
             return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(userId, taskStatus));
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -78,8 +76,8 @@ public class TaskController {
                                          @RequestBody String taskName) {
         try {
             return ResponseEntity.ok(taskService.changeTaskName(userId, taskId, taskName));
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -91,8 +89,8 @@ public class TaskController {
                                                 @RequestBody String description) {
         try {
             return ResponseEntity.ok(taskService.changeTaskDescription(userId, taskId, description));
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -104,8 +102,8 @@ public class TaskController {
                                            @RequestBody String taskStatus) {
         try {
             return ResponseEntity.ok(taskService.changeTaskStatus(userId, taskId, taskStatus));
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -117,10 +115,8 @@ public class TaskController {
                                              @RequestBody LocalDate deadline) {
         try {
             return ResponseEntity.ok(taskService.changeTaskDeadline(userId, taskId, deadline));
-        } catch (IllegalStatusFormatException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (TaskNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStatusFormatException | UserNotFoundException | TaskNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }

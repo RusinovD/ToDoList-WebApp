@@ -23,8 +23,7 @@ public class UserService {
 
     @Transactional
     public User registration (User user) {
-        if (userRepository.findByUserName(user.getUserName()) != null
-                || userRepository.findByUserName(user.getUserEmail()) != null) {
+        if (userRepository.findByUserName(user.getUserName()) != null) {
             throw new UserAlreadyExistException("Пользователь с таким именем уже существует!");
         } else if (userRepository.findByUserEmail(user.getUserEmail()) != null) {
             throw new UserAlreadyExistException("Пользователь с таким email уже существует!");

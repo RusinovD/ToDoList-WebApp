@@ -24,7 +24,7 @@ public class UserController {
             userService.registration(user);
             return ResponseEntity.ok("Регистрация прошла успешно");
         } catch (UserAlreadyExistException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -36,7 +36,7 @@ public class UserController {
             userService.deleteUser(id);
             return ResponseEntity.ok("Пользователь успешно удален");
         } catch (UserNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
@@ -52,7 +52,7 @@ public class UserController {
                 return ResponseEntity.ok(userDto.getUserName() + "\n список задач пуст.");
             }
         } catch (UserNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
         }
