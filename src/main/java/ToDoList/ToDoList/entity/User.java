@@ -16,11 +16,9 @@ public class User {
     private long id;
 
     @Column(name = "name", nullable = false)
-    @NotBlank
     private String userName;
 
     @Column(name = "email", nullable = false)
-    @Email(message = "Неверный формат email")
     private String userEmail;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
