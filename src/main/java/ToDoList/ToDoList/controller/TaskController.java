@@ -2,9 +2,6 @@ package ToDoList.ToDoList.controller;
 
 import ToDoList.ToDoList.dto.TaskDto;
 import ToDoList.ToDoList.enums.TaskStatus;
-import ToDoList.ToDoList.exceptions.IllegalStatusFormatException;
-import ToDoList.ToDoList.exceptions.TaskNotFoundException;
-import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,108 +14,60 @@ import java.time.LocalDate;
 @RequestMapping("/v1/users/{userId}/tasks")
 @RequiredArgsConstructor
 @Validated
+
 public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/")
     public ResponseEntity addTask (@PathVariable Long userId,
                                    @RequestBody TaskDto taskDto) {
-        try {
-            taskService.addTask(userId, taskDto);
-            return ResponseEntity.ok("Задача успешно добавлена!");
-
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        taskService.addTask(userId, taskDto);
+        return ResponseEntity.ok("Задача успешно добавлена!");
     }
 
     @GetMapping("/")
     public ResponseEntity getAllTasks (@PathVariable Long userId) {
-        try {
-            return ResponseEntity.ok(taskService.findAllTasksByUserId(userId));
-        } catch (UserNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        return ResponseEntity.ok(taskService.findAllTasksByUserId(userId));
     }
 
     @DeleteMapping("/")
     public ResponseEntity deleteTaskById (@PathVariable Long userId,
                                           @RequestParam Long taskId) {
-        try {
-            taskService.deleteTaskById(userId, taskId);
+        taskService.deleteTaskById(userId, taskId);
             return ResponseEntity.ok("Задача успешно удалена!");
-        } catch (UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
     }
 
     @GetMapping("/filter")
     public ResponseEntity filterTasksByStatus (@PathVariable Long userId,
-                                               @RequestParam TaskStatus taskStatus) { //
-        try {
-            return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(userId, taskStatus));
-        } catch (UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+                                               @RequestParam TaskStatus taskStatus) {
+        return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(userId, taskStatus));
     }
 
     @PatchMapping("/name")
     public ResponseEntity changeTaskName(@PathVariable Long userId,
                                          @RequestParam Long taskId,
                                          @RequestBody String taskName) {
-        try {
-            return ResponseEntity.ok(taskService.changeTaskName(userId, taskId, taskName));
-        } catch (UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        return ResponseEntity.ok(taskService.changeTaskName(userId, taskId, taskName));
     }
 
     @PatchMapping("/description")
     public ResponseEntity changeTaskDescription(@PathVariable Long userId,
                                                 @RequestParam Long taskId,
                                                 @RequestBody String description) {
-        try {
-            return ResponseEntity.ok(taskService.changeTaskDescription(userId, taskId, description));
-        } catch (UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        return ResponseEntity.ok(taskService.changeTaskDescription(userId, taskId, description));
     }
 
     @PatchMapping("/status")
     public ResponseEntity changeTaskStatus(@PathVariable Long userId,
                                            @RequestParam Long taskId,
                                            @RequestBody String taskStatus) {
-        try {
-            return ResponseEntity.ok(taskService.changeTaskStatus(userId, taskId, taskStatus));
-        } catch (UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        return ResponseEntity.ok(taskService.changeTaskStatus(userId, taskId, taskStatus));
     }
 
     @PatchMapping("/deadline")
     public ResponseEntity changeTaskDeadline(@PathVariable Long userId,
                                              @RequestParam Long taskId,
                                              @RequestBody LocalDate deadline) {
-        try {
-            return ResponseEntity.ok(taskService.changeTaskDeadline(userId, taskId, deadline));
-        } catch (IllegalStatusFormatException | UserNotFoundException | TaskNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Произошла ошибка, попробуйте снова.");
-        }
+        return ResponseEntity.ok(taskService.changeTaskDeadline(userId, taskId, deadline));
     }
 }

@@ -22,6 +22,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
+    private final UserService userService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapping taskMapping;
@@ -29,13 +30,14 @@ public class TaskService {
     @Transactional
     public Task addTask (Long userId, TaskDto taskDto) {
         Task task = taskMapping.toTask(taskDto);
-        task.setUser(userRepository.getUserById(userId));
+        User user = userService.checkUserById(userId);
+        task.setUser(user);
         return taskRepository.save(task);
     }
 
     @Transactional
     public List<TaskDto> findAllTasksByUserId(Long id) {
-        User user = userRepository.getUserById(id);
+        User user = userService.checkUserById(id);
         List<TaskDto> taskDtoList = user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
         if (!taskDtoList.isEmpty()) {
             return taskDtoList;

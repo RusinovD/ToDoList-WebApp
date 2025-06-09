@@ -7,9 +7,7 @@ import ToDoList.ToDoList.exceptions.UserAlreadyExistException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
@@ -33,16 +31,17 @@ public class UserService {
 
     @Transactional
     public void deleteUser (Long userId) {
-        userRepository.delete(getUserById(userId));
+        userRepository.delete(checkUserById(userId));
     }
 
     @Transactional
     @Query("SELECT a FROM users a JOIN FETCH a.tasks")
     public UserDto getUser(Long userId) {
-        return userMapping.toDto(getUserById(userId));
+        return userMapping.toDto(checkUserById(userId));
     }
 
-    protected User getUserById(Long id) {
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    public User checkUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             return user.get();
