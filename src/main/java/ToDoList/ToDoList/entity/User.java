@@ -20,7 +20,7 @@ public class User {
     private String userName;
 
     @Column(name = "email", nullable = false)
-    @Email
+    @Email(message = "Неверный формат email")
     private String userEmail;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

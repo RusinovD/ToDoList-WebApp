@@ -4,20 +4,19 @@ package ToDoList.ToDoList.controller;
 import ToDoList.ToDoList.dto.UserDto;
 import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
-@Validated
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity registration (@RequestBody User user) {
+    public ResponseEntity registration (@Valid @RequestBody User user) {
         userService.registration(user);
         return ResponseEntity.ok("Регистрация прошла успешно");
     }
