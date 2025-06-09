@@ -1,11 +1,13 @@
 package ToDoList.ToDoList.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     @NotNull(message = "Имя пользователя не может быть пустым")
     @NotBlank(message = "Имя пользователя не может содержать только пробелы")
