@@ -16,8 +16,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/")
-    public ResponseEntity registration (@Valid @RequestBody User user) {
-        userService.registration(user);
+    public ResponseEntity registration (@Valid @RequestBody UserDto userDto) {
+        userService.registration(userDto);
         return ResponseEntity.ok("Регистрация прошла успешно");
     }
 

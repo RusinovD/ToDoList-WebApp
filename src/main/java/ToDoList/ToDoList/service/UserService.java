@@ -20,13 +20,13 @@ public class UserService {
     private final UserMapping userMapping;
 
     @Transactional
-    public User registration (User user) {
-        if (userRepository.findByUserName(user.getUserName()) != null) {
+    public User registration (UserDto userDto) {
+        if (userRepository.findByUserName(userDto.getUserName()) != null) {
             throw new UserAlreadyExistException("Пользователь с таким именем уже существует!");
-        } else if (userRepository.findByUserEmail(user.getUserEmail()) != null) {
+        } else if (userRepository.findByUserEmail(userDto.getUserEmail()) != null) {
             throw new UserAlreadyExistException("Пользователь с таким email уже существует!");
         }
-        return userRepository.save(user);
+        return userRepository.save(userMapping.toUser(userDto));
     }
 
     @Transactional
