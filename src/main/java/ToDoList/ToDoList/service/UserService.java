@@ -37,7 +37,7 @@ public class UserService {
     @Transactional
     @Query("SELECT a FROM users a JOIN FETCH a.tasks")
     public UserDto getUser(Long userId) {
-        return userMapping.toDto(checkUserById(userId));
+        return userMapping.toUserDto(checkUserById(userId));
     }
 
     @Query("SELECT u FROM User u WHERE u.id = :id")

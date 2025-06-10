@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = TaskMapping.class)
 public interface UserMapping {
     @Mapping(target = "userEmail", expression = "java(shouldIncludeEmail() ? user.getUserEmail() : null)")
-    UserDto toDto (User user);
+    UserDto toUserDto(User user);
 
     User toUser (UserDto userDto);
 

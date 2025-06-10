@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper (componentModel = "spring")
 public interface TaskMapping {
 
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.id", target = "userId", ignore = true)
     TaskDto toTaskDto(Task task);
 
     Task toTask (TaskDto taskDto);
