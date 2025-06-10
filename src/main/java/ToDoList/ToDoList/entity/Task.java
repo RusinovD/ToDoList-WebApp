@@ -18,7 +18,6 @@ public class Task {
     private long id;
 
     @Column(name = "name", nullable = false)
-    @NotBlank
     private String taskName;
 
     @Column(name = "description", nullable = false)

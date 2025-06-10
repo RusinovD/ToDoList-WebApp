@@ -3,6 +3,7 @@ package ToDoList.ToDoList.controller;
 import ToDoList.ToDoList.dto.TaskDto;
 import ToDoList.ToDoList.enums.TaskStatus;
 import ToDoList.ToDoList.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +21,7 @@ public class TaskController {
 
     @PostMapping("/")
     public ResponseEntity addTask (@PathVariable Long userId,
-                                   @RequestBody TaskDto taskDto) {
+                                   @Valid @RequestBody TaskDto taskDto) {
         taskService.addTask(userId, taskDto);
         return ResponseEntity.ok("Задача успешно добавлена!");
     }

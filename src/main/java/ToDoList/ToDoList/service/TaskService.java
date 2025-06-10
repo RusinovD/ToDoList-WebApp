@@ -29,8 +29,9 @@ public class TaskService {
 
     @Transactional
     public Task addTask (Long userId, TaskDto taskDto) {
-        Task task = taskMapping.toTask(taskDto);
         User user = userService.checkUserById(userId);
+        taskDto.setTaskStatus(TaskStatus.TODO);
+        Task task = taskMapping.toTask(taskDto);
         task.setUser(user);
         return taskRepository.save(task);
     }
