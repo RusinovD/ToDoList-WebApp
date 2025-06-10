@@ -49,13 +49,13 @@ public class TaskService {
 
     @Transactional
     public void deleteTaskById(Long userId, Long taskId) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         taskRepository.delete(getTaskById(taskId));
     }
 
     @Transactional
     public List<TaskDto> findAllByUserIdAndStatus (Long userId, TaskStatus taskStatus) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         List<TaskDto> taskDtoList = user.getTaskList().stream().
                 filter(e -> e.getTaskStatus().equals(taskStatus)).
                 map(taskMapping::toTaskDto).toList();
@@ -68,7 +68,7 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskName(Long userId, Long taskId, String taskName) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskName(taskName);
         taskRepository.save(task);
@@ -77,7 +77,7 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskDescription(Long userId, Long taskId, String taskDescription) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskDescription(taskDescription);
         taskRepository.save(task);
@@ -86,7 +86,7 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskStatus(Long userId, Long taskId, String taskStatus) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         Task task = getTaskById(taskId);
         try {
             task.setTaskStatus(TaskStatus.valueOf(taskStatus));
@@ -99,7 +99,7 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskDeadline(Long userId, Long taskId, LocalDate deadline) {
-        User user = userRepository.getUserById(userId);
+        User user = userService.checkUserById(userId);
         Task task = getTaskById(taskId);
         task.setTaskDeadline(deadline);
         taskRepository.save(task);

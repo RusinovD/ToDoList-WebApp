@@ -19,26 +19,26 @@ import java.time.LocalDate;
 public class TaskController {
     private final TaskService taskService;
 
-    @PostMapping("/")
+    @PostMapping("/")//
     public ResponseEntity addTask (@PathVariable Long userId,
                                    @Valid @RequestBody TaskDto taskDto) {
         taskService.addTask(userId, taskDto);
         return ResponseEntity.ok("Задача успешно добавлена!");
     }
 
-    @GetMapping("/")
+    @GetMapping("/")//
     public ResponseEntity getAllTasks (@PathVariable Long userId) {
         return ResponseEntity.ok(taskService.findAllTasksByUserId(userId));
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("/")//
     public ResponseEntity deleteTaskById (@PathVariable Long userId,
                                           @RequestParam Long taskId) {
         taskService.deleteTaskById(userId, taskId);
             return ResponseEntity.ok("Задача успешно удалена!");
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/filter")//
     public ResponseEntity filterTasksByStatus (@PathVariable Long userId,
                                                @RequestParam TaskStatus taskStatus) {
         return ResponseEntity.ok(taskService.findAllByUserIdAndStatus(userId, taskStatus));
