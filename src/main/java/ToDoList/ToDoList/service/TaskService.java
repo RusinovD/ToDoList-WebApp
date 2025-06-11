@@ -39,12 +39,7 @@ public class TaskService {
     @Transactional
     public List<TaskDto> findAllTasksByUserId(Long id) {
         User user = userService.checkUserById(id);
-        List<TaskDto> taskDtoList = user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
-        if (!taskDtoList.isEmpty()) {
-            return taskDtoList;
-        } else {
-            throw new TaskNotFoundException("Список задач пуст!");
-        }
+        return user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
     }
 
     @Transactional
@@ -56,14 +51,9 @@ public class TaskService {
     @Transactional
     public List<TaskDto> findAllByUserIdAndStatus (Long userId, TaskStatus taskStatus) {
         User user = userService.checkUserById(userId);
-        List<TaskDto> taskDtoList = user.getTaskList().stream().
+        return user.getTaskList().stream().
                 filter(e -> e.getTaskStatus().equals(taskStatus)).
                 map(taskMapping::toTaskDto).toList();
-        if (!taskDtoList.isEmpty()) {
-            return taskDtoList;
-        } else {
-            throw new TaskNotFoundException("Задач со статусом " + taskStatus + " в списке нет.");
-        }
     }
 
     @Transactional
@@ -106,7 +96,7 @@ public class TaskService {
         return taskMapping.toTaskDto(task);
     }
 
-    private Task getTaskById (Long taskId) {
+    public Task getTaskById(Long taskId) {
         Optional<Task> task = taskRepository.findById(taskId);
         if (task.isPresent()) {
             return task.get();
