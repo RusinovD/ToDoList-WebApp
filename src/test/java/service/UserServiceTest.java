@@ -32,11 +32,14 @@ public class UserServiceTest {
 
     private static final long CONSTANT_ID = 1L;
 
+    private final String CONSTANT_USER_NAME = "existingUser";
+    private final String CONSTANT_USER_EMAIL ="existingEmail@example.com";
+
+    final User user = new User();
+    final UserDto userDto = new UserDto();
+
     @Test
     void getUserTest_UserFound() {
-        final User user = mock(User.class);
-        final UserDto userDto = mock(UserDto.class);
-
         doReturn(user).when(userService).checkUserById(CONSTANT_ID);
         when(userMapping.toUserDto(user)).thenReturn(userDto); // Это правильно, так как userMapping - @Mock
 
@@ -61,7 +64,6 @@ public class UserServiceTest {
 
     @Test
     void checkUserByIdTest_UserFound() {
-        final User user = mock(User.class);
         when(userRepository.findById(CONSTANT_ID)).thenReturn(java.util.Optional.of(user));
 
         final User actual = userService.checkUserById(CONSTANT_ID);
@@ -89,7 +91,6 @@ public class UserServiceTest {
 
     @Test
     void deleteUserTest_UserFound() {
-        User user = new User();
         user.setId(CONSTANT_ID);
         when(userRepository.findById(CONSTANT_ID)).thenReturn(Optional.of(user));
 
@@ -101,58 +102,53 @@ public class UserServiceTest {
 
     @Test
     void registration_UserNameAlreadyExists() {
-        UserDto userDto = new UserDto();
-        userDto.setUserName("existingUser");
+        userDto.setUserName(CONSTANT_USER_NAME);
 
-        when(userRepository.findByUserName("existingUser")).thenReturn(new User());
+        when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(new User());
 
         assertThrows(UserAlreadyExistException.class, () -> userService.registration(userDto));
 
-        verify(userRepository).findByUserName("existingUser");
+        verify(userRepository).findByUserName(CONSTANT_USER_NAME);
         verify(userRepository, never()).findByUserEmail(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void registration_UserEmailAlreadyExists() {
-        UserDto userDto = new UserDto();
-        userDto.setUserName("newUser");
-        userDto.setUserEmail("existingEmail@example.com");
+        userDto.setUserName(CONSTANT_USER_NAME);
+        userDto.setUserEmail(CONSTANT_USER_EMAIL);
 
-        when(userRepository.findByUserName("newUser")).thenReturn(null);
-        when(userRepository.findByUserEmail("existingEmail@example.com")).thenReturn(new User());
+        when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(null);
+        when(userRepository.findByUserEmail(CONSTANT_USER_EMAIL)).thenReturn(new User());
 
         assertThrows(UserAlreadyExistException.class, () -> userService.registration(userDto));
 
-        verify(userRepository).findByUserName("newUser");
-        verify(userRepository).findByUserEmail("existingEmail@example.com");
+        verify(userRepository).findByUserName(CONSTANT_USER_NAME);
+        verify(userRepository).findByUserEmail(CONSTANT_USER_EMAIL);
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void registration_SuccessfulRegistration() {
+        userDto.setUserName(CONSTANT_USER_NAME);
+        userDto.setUserEmail(CONSTANT_USER_EMAIL);
 
-        UserDto userDto = new UserDto();
-        userDto.setUserName("newUser");
-        userDto.setUserEmail("newEmail@example.com");
+        user.setUserName(CONSTANT_USER_NAME);
+        user.setUserEmail(CONSTANT_USER_EMAIL);
 
-        User user = new User();
-        user.setUserName("newUser");
-        user.setUserEmail("newEmail@example.com");
-
-        when(userRepository.findByUserName("newUser")).thenReturn(null);
-        when(userRepository.findByUserEmail("newEmail@example.com")).thenReturn(null);
+        when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(null);
+        when(userRepository.findByUserEmail(CONSTANT_USER_EMAIL)).thenReturn(null);
         when(userMapping.toUser(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
 
         User registeredUser = userService.registration(userDto);
 
         assertNotNull(registeredUser);
-        assertEquals("newUser", registeredUser.getUserName());
-        assertEquals("newEmail@example.com", registeredUser.getUserEmail());
+        assertEquals(CONSTANT_USER_NAME, registeredUser.getUserName());
+        assertEquals(CONSTANT_USER_EMAIL, registeredUser.getUserEmail());
 
-        verify(userRepository).findByUserName("newUser");
-        verify(userRepository).findByUserEmail("newEmail@example.com");
+        verify(userRepository).findByUserName(CONSTANT_USER_NAME);
+        verify(userRepository).findByUserEmail(CONSTANT_USER_EMAIL);
         verify(userMapping).toUser(userDto);
         verify(userRepository).save(user);
     }

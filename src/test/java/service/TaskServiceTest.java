@@ -42,7 +42,7 @@ public class TaskServiceTest {
     private TaskService taskService;
 
     private final long CONSTANT_ID = 1L;
-    private final long CONSTANT_TASK_ID = 1L;
+    private final long CONSTANT_TASK_ID = 2L;
 
     @Test
     void addTaskTest_UserFound () {
