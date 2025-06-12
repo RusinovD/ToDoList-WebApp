@@ -51,7 +51,8 @@ public class TaskServiceTest {
 
     TaskDto taskDto1 = new TaskDto();
     TaskDto taskDto2 = new TaskDto();
-    List<TaskDto> taskDtoList = Arrays.asList(taskDto1, taskDto2);
+    TaskDto taskDto3 = new TaskDto();
+    List<TaskDto> taskDtoList = Arrays.asList(taskDto1, taskDto2, taskDto3);
     private final TaskStatus CONSTANT_TASK_DTO_NEW_TASK_STATUS = TaskStatus.IN_PROGRESS;
 
     Task task1 = new Task();
@@ -136,13 +137,15 @@ public class TaskServiceTest {
 
         when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
         when(taskMapping.toTaskDto(task2)).thenReturn(taskDto2);
+        when(taskMapping.toTaskDto(task3)).thenReturn(taskDto3);
 
         List<TaskDto> actualTaskDtoList = taskService.findAllTasksByUserId(CONSTANT_ID);
 
         assertNotNull(actualTaskDtoList);
         assertEquals(taskDtoList.size(), actualTaskDtoList.size());
-        assertEquals(taskDtoList.get(0).getTaskName(), actualTaskDtoList.get(0).getTaskName());
-        assertEquals(taskDtoList.get(1).getTaskName(), actualTaskDtoList.get(1).getTaskName());
+        for (int i = 0; i < taskDtoList.size(); i++) {
+            assertEquals(taskDtoList.get(i).getTaskName(), actualTaskDtoList.get(i).getTaskName());
+        }
     }
 
     @Test
