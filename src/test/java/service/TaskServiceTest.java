@@ -11,6 +11,7 @@ import ToDoList.ToDoList.repository.TaskRepository;
 import ToDoList.ToDoList.repository.UserRepository;
 import ToDoList.ToDoList.service.TaskService;
 import ToDoList.ToDoList.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -76,6 +77,33 @@ public class TaskServiceTest {
     private final LocalDate CONSTANT_TASK_DEADLINE1 = LocalDate.of(2025, 6,15);
     private final LocalDate CONSTANT_TASK_NEW_DEADLINE = LocalDate.of(2025, 7,15);
 
+    @BeforeEach
+    void setUp(){
+        user.setId(CONSTANT_ID);
+        user.setTaskList(taskList);
+
+        task1.setId(CONSTANT_TASK_ID1);
+        task1.setTaskName(CONSTANT_TASK_NAME1);
+        task1.setTaskStatus(CONSTANT_TASK_STATUS2);
+        task1.setTaskDescription(CONSTANT_TASK_DESCRIPTION1);
+
+        task2.setId(CONSTANT_TASK_ID2);
+        task2.setTaskName(CONSTANT_TASK_NAME2);
+        task2.setTaskStatus(CONSTANT_TASK_STATUS2);
+
+        task3.setId(CONSTANT_TASK_ID3);
+        task3.setTaskStatus(CONSTANT_TASK_STATUS3);
+
+        List<Task> taskList = List.of(task1, task2, task3);
+        user.setTaskList(taskList);
+
+        taskDto1.setTaskName(CONSTANT_TASK_DTO_NAME1);
+        taskDto1.setTaskStatus(CONSTANT_TASK_STATUS2);
+
+        taskDto2.setTaskName(CONSTANT_TASK_DTO_NAME2);
+        taskDto2.setTaskStatus(CONSTANT_TASK_STATUS2);
+    }
+
     @Test
     void addTaskTest_UserFound () {
         doReturn(user).when(userService).checkUserById(CONSTANT_ID);
@@ -104,15 +132,6 @@ public class TaskServiceTest {
 
     @Test
     void findAllTasksByUserIdTest_UserFound() {
-        user.setId(CONSTANT_ID);
-        user.setTaskList(taskList);
-
-        task1.setTaskName(CONSTANT_TASK_NAME1);
-        task2.setTaskName(CONSTANT_TASK_NAME2);
-
-        taskDto1.setTaskName(CONSTANT_TASK_DTO_NAME1);
-        taskDto2.setTaskName(CONSTANT_TASK_DTO_NAME2);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
 
         when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
@@ -138,9 +157,6 @@ public class TaskServiceTest {
 
     @Test
     void deleteTaskByIdTest_UserFound_TaskFound() {
-        user.setId(CONSTANT_ID);
-        task1.setId(CONSTANT_TASK_ID1);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
 
@@ -153,9 +169,6 @@ public class TaskServiceTest {
 
     @Test
     void deleteTaskByIdTest_UserFound_TaskNotFound() {
-        user.setId(CONSTANT_ID);
-        task1.setId(CONSTANT_TASK_ID1);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
@@ -188,14 +201,6 @@ public class TaskServiceTest {
 
     @Test
     void findAllByUserIdAndStatusTest_UserFound_TaskListIsEmpty() {
-        user.setId(CONSTANT_ID);
-
-        task1.setTaskStatus(CONSTANT_TASK_STATUS2);
-        task2.setTaskStatus(CONSTANT_TASK_STATUS2);
-        task3.setTaskStatus(CONSTANT_TASK_STATUS3);
-        List<Task> taskList = List.of(task1, task2, task3);
-        user.setTaskList(taskList);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
 
         List<TaskDto> actualTaskDtoList1 = taskService.findAllByUserIdAndStatus(CONSTANT_ID, TaskStatus.TODO);
@@ -208,23 +213,6 @@ public class TaskServiceTest {
 
     @Test
     void findAllByUserIdAndStatusTest_UserFound_TaskList() {
-        user.setId(CONSTANT_ID);
-
-        task1.setId(CONSTANT_TASK_ID1);
-        task1.setTaskStatus(CONSTANT_TASK_STATUS2);
-
-        task2.setId(CONSTANT_TASK_ID2);
-        task2.setTaskStatus(CONSTANT_TASK_STATUS2);
-
-        task3.setId(CONSTANT_TASK_ID3);
-        task3.setTaskStatus(CONSTANT_TASK_STATUS3);
-
-        List<Task> taskList = List.of(task1, task2, task3);
-        user.setTaskList(taskList);
-
-        taskDto1.setTaskStatus(CONSTANT_TASK_STATUS2);
-        taskDto2.setTaskStatus(CONSTANT_TASK_STATUS2);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
         when(taskMapping.toTaskDto(task2)).thenReturn(taskDto2);
@@ -251,11 +239,6 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskNameTest_UserFound_TaskNotFound(){
-        user.setId(CONSTANT_ID);
-        task1.setTaskName(CONSTANT_TASK_NAME1);
-
-
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
@@ -270,10 +253,7 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskNameTest_UserFound_TaskFound(){
-        user.setId(CONSTANT_ID);
-
         taskDto1.setTaskName(CONSTANT_NEW_TASK_NAME);
-
         task1.setTaskName(CONSTANT_TASK_NAME1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
@@ -304,9 +284,6 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDescriptionTest_UserFound_TaskNotFound(){
-        user.setId(CONSTANT_ID);
-        task1.setTaskDescription(CONSTANT_TASK_DESCRIPTION1);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
@@ -321,10 +298,7 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDescriptionTest_UserFound_TaskFound(){
-        user.setId(CONSTANT_ID);
-
         taskDto1.setTaskDescription(CONSTANT_TASK_NEW_DESCRIPTION);
-
         task1.setTaskDescription(CONSTANT_TASK_DESCRIPTION1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
@@ -356,9 +330,6 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskStatusTest_UserFound_TaskNotFound(){
-        user.setId(CONSTANT_ID);
-        task1.setTaskStatus(CONSTANT_TASK_STATUS1);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
@@ -373,15 +344,10 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskStatusTest_UserFound_TaskFound(){
-        user.setId(CONSTANT_ID);
-
         taskDto1.setTaskStatus(CONSTANT_TASK_DTO_NEW_TASK_STATUS);
 
-        Task task = new Task();
-        task.setTaskStatus(TaskStatus.TODO);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task));
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
         when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
         TaskDto actualTaskDto = taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_STATUS);
@@ -392,8 +358,8 @@ public class TaskServiceTest {
 
         verify(userService).checkUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
-        verify(taskRepository).save(task);
-        verify(taskMapping).toTaskDto(task);
+        verify(taskRepository).save(task1);
+        verify(taskMapping).toTaskDto(task1);
     }
 
     @Test
@@ -408,10 +374,6 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDeadlineTest_UserFound_TaskNotFound(){
-        user.setId(CONSTANT_ID);
-
-        task1.setTaskDeadline(CONSTANT_TASK_DEADLINE1);
-
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
@@ -426,11 +388,7 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDeadlineTest_UserFound_TaskFound(){
-        user.setId(CONSTANT_ID);
-
         taskDto1.setTaskDeadline(CONSTANT_TASK_NEW_DEADLINE);
-
-        task1.setTaskDeadline(CONSTANT_TASK_DEADLINE1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
@@ -450,8 +408,6 @@ public class TaskServiceTest {
 
     @Test
     void getTaskByIdTest_TaskFound(){
-        task1.setId(CONSTANT_TASK_ID1);
-
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
 
         Task actualTask = taskService.getTaskById(CONSTANT_TASK_ID1);
@@ -459,7 +415,6 @@ public class TaskServiceTest {
         assertNotNull(actualTask);
 
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
-
     }
 
     @Test
