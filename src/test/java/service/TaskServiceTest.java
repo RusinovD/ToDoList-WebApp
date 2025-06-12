@@ -42,26 +42,54 @@ public class TaskServiceTest {
     private TaskService taskService;
 
     private final long CONSTANT_ID = 1L;
-    private final long CONSTANT_TASK_ID = 2L;
+    private final long CONSTANT_TASK_ID1 = 2L;
+    private final long CONSTANT_TASK_ID2 = 3L;
+    private final long CONSTANT_TASK_ID3 = 4L;
+
+    User user = new User();
+
+    TaskDto taskDto1 = new TaskDto();
+    TaskDto taskDto2 = new TaskDto();
+    List<TaskDto> taskDtoList = Arrays.asList(taskDto1, taskDto2);
+    private final TaskStatus CONSTANT_TASK_DTO_NEW_TASK_STATUS = TaskStatus.IN_PROGRESS;
+
+    Task task1 = new Task();
+    Task task2 = new Task();
+    Task task3 = new Task();
+    List<Task> taskList = Arrays.asList(task1, task2);
+
+    private final String CONSTANT_TASK_DTO_NAME1 = "TaskDTO1";
+    private final String CONSTANT_TASK_DTO_NAME2 = "TaskDTO1";
+
+    private final String CONSTANT_TASK_NAME1 = "Task1";
+    private final String CONSTANT_TASK_NAME2 = "Task1";
+    private final String CONSTANT_NEW_TASK_NAME = "NEW Task Name";
+
+    private final String CONSTANT_TASK_DESCRIPTION1 = "Task Description1";
+    private final String CONSTANT_TASK_NEW_DESCRIPTION = "New Task Description1";
+
+    private final TaskStatus CONSTANT_TASK_STATUS1 = TaskStatus.TODO;
+    private final TaskStatus CONSTANT_TASK_STATUS2 = TaskStatus.IN_PROGRESS;
+    private final TaskStatus CONSTANT_TASK_STATUS3 = TaskStatus.DONE;
+    private final String CONSTANT_TASK_NEW_STATUS = "IN_PROGRESS";
+
+    private final LocalDate CONSTANT_TASK_DEADLINE1 = LocalDate.of(2025, 6,15);
+    private final LocalDate CONSTANT_TASK_NEW_DEADLINE = LocalDate.of(2025, 7,15);
 
     @Test
     void addTaskTest_UserFound () {
-        TaskDto taskDto = new TaskDto();
-        Task task = new Task();
-        User user = new User();
-
         doReturn(user).when(userService).checkUserById(CONSTANT_ID);
-        when(taskMapping.toTask(taskDto)).thenReturn(task);
-        when(taskRepository.save(task)).thenReturn(task);
+        when(taskMapping.toTask(taskDto1)).thenReturn(task1);
+        when(taskRepository.save(task1)).thenReturn(task1);
 
-        Task addedTask = taskService.addTask(CONSTANT_ID, taskDto);
+        Task addedTask = taskService.addTask(CONSTANT_ID, taskDto1);
 
         assertNotNull(addedTask);
-        assertEquals(addedTask, task);
+        assertEquals(addedTask, task1);
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskMapping).toTask(taskDto);
-        verify(taskRepository).save(task);
+        verify(taskMapping).toTask(taskDto1);
+        verify(taskRepository).save(task1);
     }
 
     @Test
@@ -76,21 +104,14 @@ public class TaskServiceTest {
 
     @Test
     void findAllTasksByUserIdTest_UserFound() {
-        User user = new User();
         user.setId(CONSTANT_ID);
-
-        Task task1 = new Task();
-        task1.setTaskName("Task 1");
-        Task task2 = new Task();
-        task2.setTaskName("Task 2");
-        List<Task> taskList = Arrays.asList(task1, task2);
         user.setTaskList(taskList);
 
-        TaskDto taskDto1 = new TaskDto();
-        taskDto1.setTaskName("Task 1 DTO");
-        TaskDto taskDto2 = new TaskDto();
-        taskDto2.setTaskName("Task 2 DTO");
-        List<TaskDto> taskDtoList = Arrays.asList(taskDto1, taskDto2);
+        task1.setTaskName(CONSTANT_TASK_NAME1);
+        task2.setTaskName(CONSTANT_TASK_NAME2);
+
+        taskDto1.setTaskName(CONSTANT_TASK_DTO_NAME1);
+        taskDto2.setTaskName(CONSTANT_TASK_DTO_NAME2);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
 
@@ -117,35 +138,32 @@ public class TaskServiceTest {
 
     @Test
     void deleteTaskByIdTest_UserFound_TaskFound() {
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
-        task.setId(CONSTANT_ID);
+        task1.setId(CONSTANT_TASK_ID1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_ID)).thenReturn(Optional.of(task));
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
 
-        assertDoesNotThrow(() -> taskService.deleteTaskById(CONSTANT_ID, CONSTANT_TASK_ID));
+        assertDoesNotThrow(() -> taskService.deleteTaskById(CONSTANT_ID, CONSTANT_TASK_ID1));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
-        verify(taskRepository).delete(task);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
+        verify(taskRepository).delete(task1);
     }
 
     @Test
     void deleteTaskByIdTest_UserFound_TaskNotFound() {
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
+        task1.setId(CONSTANT_TASK_ID1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_ID)).thenReturn(Optional.empty());
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,() -> taskService.deleteTaskById(CONSTANT_ID, CONSTANT_TASK_ID));
+        assertThrows(TaskNotFoundException.class,() -> taskService.deleteTaskById(CONSTANT_ID, CONSTANT_TASK_ID1));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
-        verify(taskRepository, never()).delete(task);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
+        verify(taskRepository, never()).delete(task1);
     }
 
     @Test
@@ -170,15 +188,11 @@ public class TaskServiceTest {
 
     @Test
     void findAllByUserIdAndStatusTest_UserFound_TaskListIsEmpty() {
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        Task task1 = new Task();
-        task1.setTaskStatus(TaskStatus.IN_PROGRESS);
-        Task task2 = new Task();
-        task2.setTaskStatus(TaskStatus.IN_PROGRESS);
-        Task task3 = new Task();
-        task3.setTaskStatus(TaskStatus.DONE);
+        task1.setTaskStatus(CONSTANT_TASK_STATUS2);
+        task2.setTaskStatus(CONSTANT_TASK_STATUS2);
+        task3.setTaskStatus(CONSTANT_TASK_STATUS3);
         List<Task> taskList = List.of(task1, task2, task3);
         user.setTaskList(taskList);
 
@@ -194,39 +208,35 @@ public class TaskServiceTest {
 
     @Test
     void findAllByUserIdAndStatusTest_UserFound_TaskList() {
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        Task task1 = new Task();
-        task1.setId(1L);
-        task1.setTaskStatus(TaskStatus.IN_PROGRESS);
-        Task task2 = new Task();
-        task2.setId(2L);
-        task2.setTaskStatus(TaskStatus.IN_PROGRESS);
-        Task task3 = new Task();
-        task3.setId(3L);
-        task3.setTaskStatus(TaskStatus.DONE);
+        task1.setId(CONSTANT_TASK_ID1);
+        task1.setTaskStatus(CONSTANT_TASK_STATUS2);
+
+        task2.setId(CONSTANT_TASK_ID2);
+        task2.setTaskStatus(CONSTANT_TASK_STATUS2);
+
+        task3.setId(CONSTANT_TASK_ID3);
+        task3.setTaskStatus(CONSTANT_TASK_STATUS3);
+
         List<Task> taskList = List.of(task1, task2, task3);
         user.setTaskList(taskList);
 
-        TaskDto taskDto1 = new TaskDto();
-        taskDto1.setTaskStatus(TaskStatus.IN_PROGRESS);
-        TaskDto taskDto2 = new TaskDto();
-        taskDto2.setTaskStatus(TaskStatus.IN_PROGRESS);
+        taskDto1.setTaskStatus(CONSTANT_TASK_STATUS2);
+        taskDto2.setTaskStatus(CONSTANT_TASK_STATUS2);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
         when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
         when(taskMapping.toTaskDto(task2)).thenReturn(taskDto2);
 
-        List<TaskDto> actualTaskDtoList2 = taskService.findAllByUserIdAndStatus(CONSTANT_ID, TaskStatus.IN_PROGRESS);
+        List<TaskDto> actualTaskDtoList2 = taskService.findAllByUserIdAndStatus(CONSTANT_ID, CONSTANT_TASK_STATUS2);
 
         for (TaskDto taskDto : actualTaskDtoList2) {
-            assertEquals(TaskStatus.IN_PROGRESS, taskDto.getTaskStatus());
+            assertEquals(CONSTANT_TASK_STATUS2, taskDto.getTaskStatus());
         }
 
         verify(taskMapping).toTaskDto(task1);
         verify(taskMapping).toTaskDto(task2);
-
     }
 
     @Test
@@ -241,51 +251,45 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskNameTest_UserFound_TaskNotFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
-        task.setTaskName("oldname");
+        task1.setTaskName(CONSTANT_TASK_NAME1);
 
-        String newTaskName = "newname";
+
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.empty());
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class, () -> taskService.changeTaskName(CONSTANT_ID, CONSTANT_TASK_ID, newTaskName));
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.changeTaskName(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_NEW_TASK_NAME));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
         verify(taskMapping, never()).toTaskDto(any());
     }
 
     @Test
     void changeTaskNameTest_UserFound_TaskFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        String newTaskName = "newname";
+        taskDto1.setTaskName(CONSTANT_NEW_TASK_NAME);
 
-        TaskDto taskDto = new TaskDto();
-        taskDto.setTaskName(newTaskName);
-
-        Task task = new Task();
-        task.setTaskName("oldname");
+        task1.setTaskName(CONSTANT_TASK_NAME1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.of(task));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto);
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
+        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
-        TaskDto actualTaskDto = taskService.changeTaskName(CONSTANT_ID, CONSTANT_TASK_ID, newTaskName);
+        TaskDto actualTaskDto = taskService.changeTaskName(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_NEW_TASK_NAME);
 
         assertNotNull(actualTaskDto);
 
-        assertEquals(newTaskName, actualTaskDto.getTaskName());
+        assertEquals(CONSTANT_NEW_TASK_NAME, actualTaskDto.getTaskName());
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
-        verify(taskRepository).save(task);
-        verify(taskMapping).toTaskDto(task);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
+        verify(taskRepository).save(task1);
+        verify(taskMapping).toTaskDto(task1);
     }
 
     @Test
@@ -300,52 +304,44 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDescriptionTest_UserFound_TaskNotFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
-        task.setTaskDescription("oldDescription");
-
-        String newTaskDescription = "newDescription";
+        task1.setTaskDescription(CONSTANT_TASK_DESCRIPTION1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.empty());
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
         assertThrows(TaskNotFoundException.class,
-                () -> taskService.changeTaskDescription(CONSTANT_ID, CONSTANT_TASK_ID, newTaskDescription));
+                () -> taskService.changeTaskDescription(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DESCRIPTION));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
         verify(taskMapping, never()).toTaskDto(any());
     }
 
     @Test
     void changeTaskDescriptionTest_UserFound_TaskFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        String newTaskDescription = "newDescription";
+        taskDto1.setTaskDescription(CONSTANT_TASK_NEW_DESCRIPTION);
 
-        TaskDto taskDto = new TaskDto();
-        taskDto.setTaskDescription(newTaskDescription);
-
-        Task task = new Task();
-        task.setTaskDescription("oldDescription");
+        task1.setTaskDescription(CONSTANT_TASK_DESCRIPTION1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.of(task));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto);
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
+        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
-        TaskDto actualTaskDto = taskService.changeTaskDescription(CONSTANT_ID, CONSTANT_TASK_ID, newTaskDescription);
+        TaskDto actualTaskDto =
+                taskService.changeTaskDescription(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DESCRIPTION);
 
         assertNotNull(actualTaskDto);
 
-        assertEquals(newTaskDescription, actualTaskDto.getTaskDescription());
+        assertEquals(CONSTANT_TASK_NEW_DESCRIPTION, actualTaskDto.getTaskDescription());
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
-        verify(taskRepository).save(task);
-        verify(taskMapping).toTaskDto(task);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
+        verify(taskRepository).save(task1);
+        verify(taskMapping).toTaskDto(task1);
     }
 
     @Test
@@ -360,51 +356,42 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskStatusTest_UserFound_TaskNotFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
-        task.setTaskStatus(TaskStatus.TODO);
-
-        String newTaskStatus = "IN_PROGRESS";
+        task1.setTaskStatus(CONSTANT_TASK_STATUS1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.empty());
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
         assertThrows(TaskNotFoundException.class,
-                () -> taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID, newTaskStatus));
+                () -> taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_STATUS));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
         verify(taskMapping, never()).toTaskDto(any());
     }
 
     @Test
     void changeTaskStatusTest_UserFound_TaskFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        String newTaskStatus = "IN_PROGRESS";
-        TaskStatus taskStatusNew = TaskStatus.IN_PROGRESS;
-
-        TaskDto taskDto = new TaskDto();
-        taskDto.setTaskStatus(taskStatusNew);
+        taskDto1.setTaskStatus(CONSTANT_TASK_DTO_NEW_TASK_STATUS);
 
         Task task = new Task();
         task.setTaskStatus(TaskStatus.TODO);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.of(task));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto);
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task));
+        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
-        TaskDto actualTaskDto = taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID, newTaskStatus);
+        TaskDto actualTaskDto = taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_STATUS);
 
         assertNotNull(actualTaskDto);
 
-        assertEquals(taskStatusNew, actualTaskDto.getTaskStatus());
+        assertEquals(CONSTANT_TASK_DTO_NEW_TASK_STATUS, actualTaskDto.getTaskStatus());
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository).save(task);
         verify(taskMapping).toTaskDto(task);
     }
@@ -421,77 +408,66 @@ public class TaskServiceTest {
 
     @Test
     void changeTaskDeadlineTest_UserFound_TaskNotFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
-        Task task = new Task();
-        task.setTaskDeadline(LocalDate.of(2025, 6,15));
 
-        LocalDate newTaskDeadline = LocalDate.of(2025, 6,20);
+        task1.setTaskDeadline(CONSTANT_TASK_DEADLINE1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.empty());
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.empty());
 
         assertThrows(TaskNotFoundException.class,
-                () -> taskService.changeTaskDeadline(CONSTANT_ID, CONSTANT_TASK_ID, newTaskDeadline));
+                () -> taskService.changeTaskDeadline(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DEADLINE));
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
         verify(taskMapping, never()).toTaskDto(any());
     }
 
     @Test
     void changeTaskDeadlineTest_UserFound_TaskFound(){
-        User user = new User();
         user.setId(CONSTANT_ID);
 
-        LocalDate newTaskDeadline = (LocalDate.of(2025, 6,15));;
+        taskDto1.setTaskDeadline(CONSTANT_TASK_NEW_DEADLINE);
 
-        TaskDto taskDto = new TaskDto();
-        taskDto.setTaskDeadline(newTaskDeadline);
-
-        Task task = new Task();
-        task.setTaskDeadline(LocalDate.of(2025, 6,15));
+        task1.setTaskDeadline(CONSTANT_TASK_DEADLINE1);
 
         when(userService.checkUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.of(task));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto);
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
+        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
-        TaskDto actualTaskDto = taskService.changeTaskDeadline(CONSTANT_ID, CONSTANT_TASK_ID, newTaskDeadline);
+        TaskDto actualTaskDto = taskService.changeTaskDeadline(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DEADLINE);
 
         assertNotNull(actualTaskDto);
 
-        assertEquals(newTaskDeadline, actualTaskDto.getTaskDeadline());
+        assertEquals(CONSTANT_TASK_NEW_DEADLINE, actualTaskDto.getTaskDeadline());
 
         verify(userService).checkUserById(CONSTANT_ID);
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
-        verify(taskRepository).save(task);
-        verify(taskMapping).toTaskDto(task);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
+        verify(taskRepository).save(task1);
+        verify(taskMapping).toTaskDto(task1);
     }
 
     @Test
     void getTaskByIdTest_TaskFound(){
-        Task task = new Task();
-        task.setId(CONSTANT_TASK_ID);
+        task1.setId(CONSTANT_TASK_ID1);
 
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenReturn(Optional.of(task));
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
 
-        Task actualTask = taskService.getTaskById(CONSTANT_TASK_ID);
+        Task actualTask = taskService.getTaskById(CONSTANT_TASK_ID1);
 
         assertNotNull(actualTask);
 
-        verify(taskRepository).findById(CONSTANT_TASK_ID);
+        verify(taskRepository).findById(CONSTANT_TASK_ID1);
 
     }
 
     @Test
     void getTaskByIdTest_TaskNotFound(){
-        when(taskRepository.findById(CONSTANT_TASK_ID)).thenThrow(new TaskNotFoundException("Задача не найдена"));
+        when(taskRepository.findById(CONSTANT_TASK_ID1)).thenThrow(new TaskNotFoundException("Задача не найдена"));
 
-        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(CONSTANT_TASK_ID));
+        assertThrows(TaskNotFoundException.class, () -> taskService.getTaskById(CONSTANT_TASK_ID1));
 
-        verify(taskService).getTaskById(CONSTANT_ID);
-
+        verify(taskService).getTaskById(CONSTANT_TASK_ID1);
     }
-
 }
