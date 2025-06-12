@@ -7,6 +7,7 @@ import ToDoList.ToDoList.exceptions.UserAlreadyExistException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
 import ToDoList.ToDoList.repository.UserRepository;
 import ToDoList.ToDoList.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,16 +33,25 @@ public class UserServiceTest {
 
     private static final long CONSTANT_ID = 1L;
 
-    private final String CONSTANT_USER_NAME = "existingUser";
-    private final String CONSTANT_USER_EMAIL ="existingEmail@example.com";
+    private final String CONSTANT_USER_NAME = "User";
+    private final String CONSTANT_USER_EMAIL ="test@example.com";
 
     final User user = new User();
     final UserDto userDto = new UserDto();
 
+    @BeforeEach
+    void setUp() {
+        user.setId(CONSTANT_ID);
+        user.setUserName(CONSTANT_USER_NAME);
+        user.setUserEmail(CONSTANT_USER_EMAIL);
+        userDto.setUserName(CONSTANT_USER_NAME);
+        userDto.setUserEmail(CONSTANT_USER_EMAIL);
+    }
+
     @Test
     void getUserTest_UserFound() {
         doReturn(user).when(userService).checkUserById(CONSTANT_ID);
-        when(userMapping.toUserDto(user)).thenReturn(userDto); // Это правильно, так как userMapping - @Mock
+        when(userMapping.toUserDto(user)).thenReturn(userDto);
 
         final UserDto result = userService.getUser(CONSTANT_ID);
 
@@ -67,8 +77,10 @@ public class UserServiceTest {
         when(userRepository.findById(CONSTANT_ID)).thenReturn(java.util.Optional.of(user));
 
         final User actual = userService.checkUserById(CONSTANT_ID);
+
         assertNotNull(actual);
         assertEquals(user, actual);
+
         verify(userRepository).findById(CONSTANT_ID);
     }
 
@@ -91,7 +103,6 @@ public class UserServiceTest {
 
     @Test
     void deleteUserTest_UserFound() {
-        user.setId(CONSTANT_ID);
         when(userRepository.findById(CONSTANT_ID)).thenReturn(Optional.of(user));
 
         assertDoesNotThrow(() -> userService.deleteUser(CONSTANT_ID));
@@ -102,8 +113,6 @@ public class UserServiceTest {
 
     @Test
     void registration_UserNameAlreadyExists() {
-        userDto.setUserName(CONSTANT_USER_NAME);
-
         when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(new User());
 
         assertThrows(UserAlreadyExistException.class, () -> userService.registration(userDto));
@@ -115,9 +124,6 @@ public class UserServiceTest {
 
     @Test
     void registration_UserEmailAlreadyExists() {
-        userDto.setUserName(CONSTANT_USER_NAME);
-        userDto.setUserEmail(CONSTANT_USER_EMAIL);
-
         when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(null);
         when(userRepository.findByUserEmail(CONSTANT_USER_EMAIL)).thenReturn(new User());
 
@@ -130,12 +136,6 @@ public class UserServiceTest {
 
     @Test
     void registration_SuccessfulRegistration() {
-        userDto.setUserName(CONSTANT_USER_NAME);
-        userDto.setUserEmail(CONSTANT_USER_EMAIL);
-
-        user.setUserName(CONSTANT_USER_NAME);
-        user.setUserEmail(CONSTANT_USER_EMAIL);
-
         when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(null);
         when(userRepository.findByUserEmail(CONSTANT_USER_EMAIL)).thenReturn(null);
         when(userMapping.toUser(userDto)).thenReturn(user);
