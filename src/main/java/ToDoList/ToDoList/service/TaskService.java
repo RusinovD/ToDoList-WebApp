@@ -10,9 +10,7 @@ import ToDoList.ToDoList.exceptions.TaskNotFoundException;
 import ToDoList.ToDoList.repository.TaskRepository;
 import ToDoList.ToDoList.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,7 +27,7 @@ public class TaskService {
 
     @Transactional
     public Task addTask (Long userId, TaskDto taskDto) {
-        User user = userService.checkUserById(userId);
+        User user = userService.findUserById(userId);
         taskDto.setTaskStatus(TaskStatus.TODO);
         Task task = taskMapping.toTask(taskDto);
         task.setUser(user);
@@ -38,19 +36,19 @@ public class TaskService {
 
     @Transactional
     public List<TaskDto> findAllTasksByUserId(Long id) {
-        User user = userService.checkUserById(id);
+        User user = userService.findUserById(id);
         return user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
     }
 
     @Transactional
     public void deleteTaskById(Long userId, Long taskId) {
-        User user = userService.checkUserById(userId);
-        taskRepository.delete(getTaskById(taskId));
+        User user = userService.findUserById(userId);
+        taskRepository.delete(findTaskById(taskId));
     }
 
     @Transactional
     public List<TaskDto> findAllByUserIdAndStatus (Long userId, TaskStatus taskStatus) {
-        User user = userService.checkUserById(userId);
+        User user = userService.findUserById(userId);
         return user.getTaskList().stream().
                 filter(e -> e.getTaskStatus().equals(taskStatus)).
                 map(taskMapping::toTaskDto).toList();
@@ -58,8 +56,8 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskName(Long userId, Long taskId, String taskName) {
-        User user = userService.checkUserById(userId);
-        Task task = getTaskById(taskId);
+        User user = userService.findUserById(userId);
+        Task task = findTaskById(taskId);
         task.setTaskName(taskName);
         taskRepository.save(task);
         return taskMapping.toTaskDto(task);
@@ -67,8 +65,8 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskDescription(Long userId, Long taskId, String taskDescription) {
-        User user = userService.checkUserById(userId);
-        Task task = getTaskById(taskId);
+        User user = userService.findUserById(userId);
+        Task task = findTaskById(taskId);
         task.setTaskDescription(taskDescription);
         taskRepository.save(task);
         return taskMapping.toTaskDto(task);
@@ -76,8 +74,8 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskStatus(Long userId, Long taskId, String taskStatus) {
-        User user = userService.checkUserById(userId);
-        Task task = getTaskById(taskId);
+        User user = userService.findUserById(userId);
+        Task task = findTaskById(taskId);
         try {
             task.setTaskStatus(TaskStatus.valueOf(taskStatus));
             taskRepository.save(task);
@@ -89,19 +87,14 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskDeadline(Long userId, Long taskId, LocalDate deadline) {
-        User user = userService.checkUserById(userId);
-        Task task = getTaskById(taskId);
+        User user = userService.findUserById(userId);
+        Task task = findTaskById(taskId);
         task.setTaskDeadline(deadline);
         taskRepository.save(task);
         return taskMapping.toTaskDto(task);
     }
 
-    public Task getTaskById(Long taskId) {
-        Optional<Task> task = taskRepository.findById(taskId);
-        if (task.isPresent()) {
-            return task.get();
-        } else {
-            throw new TaskNotFoundException("Задача не найдена");
-        }
+    public Task findTaskById(Long taskId) {
+        return taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
     }
 }

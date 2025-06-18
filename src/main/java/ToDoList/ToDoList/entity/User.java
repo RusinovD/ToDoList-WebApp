@@ -7,7 +7,7 @@ import java.util.List;
 import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 @Data
 @NoArgsConstructor
 public class User {

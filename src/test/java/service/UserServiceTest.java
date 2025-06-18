@@ -50,7 +50,7 @@ public class UserServiceTest {
 
     @Test
     void getUserTest_UserFound() {
-        doReturn(user).when(userService).checkUserById(CONSTANT_ID);
+        doReturn(user).when(userService).findUserById(CONSTANT_ID);
         when(userMapping.toUserDto(user)).thenReturn(userDto);
 
         final UserDto result = userService.getUser(CONSTANT_ID);
@@ -58,7 +58,7 @@ public class UserServiceTest {
         assertNotNull(result);
         assertEquals(userDto, result);
 
-        verify(userService).checkUserById(CONSTANT_ID);
+        verify(userService).findUserById(CONSTANT_ID);
         verify(userMapping).toUserDto(user);
     }
 
@@ -73,10 +73,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void checkUserByIdTest_UserFound() {
+    void findUserByIdTest_UserFound() {
         when(userRepository.findById(CONSTANT_ID)).thenReturn(java.util.Optional.of(user));
 
-        final User actual = userService.checkUserById(CONSTANT_ID);
+        final User actual = userService.findUserById(CONSTANT_ID);
 
         assertNotNull(actual);
         assertEquals(user, actual);
@@ -85,10 +85,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void checkUserByIdTest_UserNotFound() {
+    void findUserByIdTest_UserNotFound() {
         when(userRepository.findById(CONSTANT_ID)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.checkUserById(CONSTANT_ID));
+        assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
     }
 
     @Test
