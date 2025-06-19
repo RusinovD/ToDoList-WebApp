@@ -1,12 +1,12 @@
-package ToDoList.ToDoList.dto.mapping;
+package ToDoList.ToDoList.dto.mappers;
 
 import ToDoList.ToDoList.dto.UserDto;
 import ToDoList.ToDoList.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = TaskMapping.class)
-public interface UserMapping {
+@Mapper(componentModel = "spring", uses = TaskMapper.class)
+public interface UserMapper {
     @Mapping(target = "userEmail", expression = "java(shouldIncludeEmail() ? user.getUserEmail() : null)")
     UserDto toUserDto(User user);
 

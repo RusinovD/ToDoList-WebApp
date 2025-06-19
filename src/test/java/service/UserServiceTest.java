@@ -1,7 +1,7 @@
 package service;
 
 import ToDoList.ToDoList.dto.UserDto;
-import ToDoList.ToDoList.dto.mapping.UserMapping;
+import ToDoList.ToDoList.dto.mappers.UserMapper;
 import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.exceptions.UserAlreadyExistException;
 import ToDoList.ToDoList.exceptions.UserNotFoundException;
@@ -25,7 +25,7 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapping userMapping;
+    private UserMapper userMapper;
 
     @InjectMocks
     @Spy
@@ -51,7 +51,7 @@ public class UserServiceTest {
     @Test
     void getUserTest_UserFound() {
         doReturn(user).when(userService).findUserById(CONSTANT_ID);
-        when(userMapping.toUserDto(user)).thenReturn(userDto);
+        when(userMapper.toUserDto(user)).thenReturn(userDto);
 
         final UserDto result = userService.getUser(CONSTANT_ID);
 
@@ -59,7 +59,7 @@ public class UserServiceTest {
         assertEquals(userDto, result);
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(userMapping).toUserDto(user);
+        verify(userMapper).toUserDto(user);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUser(CONSTANT_ID));
 
         verify(userRepository).findById(CONSTANT_ID);
-        verify(userMapping, never()).toUserDto(any());
+        verify(userMapper, never()).toUserDto(any());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.deleteUser(CONSTANT_ID));
 
         verify(userRepository).findById(CONSTANT_ID);
-        verify(userMapping, never()).toUserDto(any());
+        verify(userMapper, never()).toUserDto(any());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class UserServiceTest {
     void registration_SuccessfulRegistration() {
         when(userRepository.findByUserName(CONSTANT_USER_NAME)).thenReturn(null);
         when(userRepository.findByUserEmail(CONSTANT_USER_EMAIL)).thenReturn(null);
-        when(userMapping.toUser(userDto)).thenReturn(user);
+        when(userMapper.toUser(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
 
         User registeredUser = userService.registration(userDto);
@@ -149,7 +149,7 @@ public class UserServiceTest {
 
         verify(userRepository).findByUserName(CONSTANT_USER_NAME);
         verify(userRepository).findByUserEmail(CONSTANT_USER_EMAIL);
-        verify(userMapping).toUser(userDto);
+        verify(userMapper).toUser(userDto);
         verify(userRepository).save(user);
     }
 }

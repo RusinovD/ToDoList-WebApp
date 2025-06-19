@@ -2,9 +2,11 @@ package ToDoList.ToDoList.dto;
 
 import ToDoList.ToDoList.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
 
@@ -25,6 +27,4 @@ public class TaskDto {
     private TaskStatus taskStatus;
 
     private Long userId;
-
-
 }

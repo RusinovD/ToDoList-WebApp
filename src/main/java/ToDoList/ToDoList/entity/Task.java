@@ -2,9 +2,9 @@ package ToDoList.ToDoList.entity;
 
 import ToDoList.ToDoList.enums.TaskStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 

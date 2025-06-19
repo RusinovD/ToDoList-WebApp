@@ -1,7 +1,7 @@
 package ToDoList.ToDoList.service;
 
 import ToDoList.ToDoList.dto.TaskDto;
-import ToDoList.ToDoList.dto.mapping.TaskMapping;
+import ToDoList.ToDoList.dto.mappers.TaskMapper;
 import ToDoList.ToDoList.entity.Task;
 import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.enums.TaskStatus;
@@ -16,22 +16,20 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
-    private final UserService userService;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
-    private final TaskMapping taskMapping;
+    private final TaskMapper taskMapper;
 
     @Transactional
     public Task addTask (Long userId, TaskDto taskDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         taskDto.setTaskStatus(TaskStatus.TODO);
-        Task task = taskMapping.toTask(taskDto);
+        Task task = taskMapper.toTask(taskDto);
         task.setUser(user);
         return taskRepository.save(task);
     }
@@ -40,13 +38,11 @@ public class TaskService {
     public List<TaskDto> findAllTasksByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        return user.getTaskList().stream().map(taskMapping::toTaskDto).toList();
+        return user.getTaskList().stream().map(taskMapper::toTaskDto).toList();
     }
 
     @Transactional
     public void deleteTaskById(Long userId, Long taskId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         taskRepository.delete(taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Задача не найдена")));
     }
@@ -57,38 +53,32 @@ public class TaskService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         return user.getTaskList().stream().
                 filter(e -> e.getTaskStatus().equals(taskStatus)).
-                map(taskMapping::toTaskDto).toList();
+                map(taskMapper::toTaskDto).toList();
     }
 
     @Transactional
     public TaskDto changeTaskName(Long userId, Long taskId, String taskName) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
         task.setTaskName(taskName);
         taskRepository.save(task);
-        return taskMapping.toTaskDto(task);
+        return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public TaskDto changeTaskDescription(Long userId, Long taskId, String taskDescription) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
         task.setTaskDescription(taskDescription);
         taskRepository.save(task);
-        return taskMapping.toTaskDto(task);
+        return taskMapper.toTaskDto(task);
     }
 
     @Transactional
     public TaskDto changeTaskStatus(Long userId, Long taskId, String taskStatus) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
         try {
             task.setTaskStatus(TaskStatus.valueOf(taskStatus));
             taskRepository.save(task);
-            return taskMapping.toTaskDto(task);
+            return taskMapper.toTaskDto(task);
         } catch (IllegalArgumentException e) {
             throw new IllegalStatusFormatException("Неверный формат статуса");
         }
@@ -96,11 +86,9 @@ public class TaskService {
 
     @Transactional
     public TaskDto changeTaskDeadline(Long userId, Long taskId, LocalDate deadline) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
         task.setTaskDeadline(deadline);
         taskRepository.save(task);
-        return taskMapping.toTaskDto(task);
+        return taskMapper.toTaskDto(task);
     }
 }

@@ -1,7 +1,7 @@
 package service;
 
 import ToDoList.ToDoList.dto.TaskDto;
-import ToDoList.ToDoList.dto.mapping.TaskMapping;
+import ToDoList.ToDoList.dto.mappers.TaskMapper;
 import ToDoList.ToDoList.entity.Task;
 import ToDoList.ToDoList.entity.User;
 import ToDoList.ToDoList.enums.TaskStatus;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
     @Mock
-    private TaskMapping taskMapping;
+    private TaskMapper taskMapper;
     @Mock
     private UserService userService;
     @Mock
@@ -108,7 +108,7 @@ public class TaskServiceTest {
     @Test
     void addTaskTest_UserFound () {
         doReturn(user).when(userService).findUserById(CONSTANT_ID);
-        when(taskMapping.toTask(taskDto1)).thenReturn(task1);
+        when(taskMapper.toTask(taskDto1)).thenReturn(task1);
         when(taskRepository.save(task1)).thenReturn(task1);
 
         Task addedTask = taskService.addTask(CONSTANT_ID, taskDto1);
@@ -117,7 +117,7 @@ public class TaskServiceTest {
         assertEquals(addedTask, task1);
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping).toTask(taskDto1);
+        verify(taskMapper).toTask(taskDto1);
         verify(taskRepository).save(task1);
     }
 
@@ -128,16 +128,16 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTask(any());
+        verify(taskMapper, never()).toTask(any());
     }
 
     @Test
     void findAllTasksByUserIdTest_UserFound() {
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
 
-        when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
-        when(taskMapping.toTaskDto(task2)).thenReturn(taskDto2);
-        when(taskMapping.toTaskDto(task3)).thenReturn(taskDto3);
+        when(taskMapper.toTaskDto(task1)).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(task2)).thenReturn(taskDto2);
+        when(taskMapper.toTaskDto(task3)).thenReturn(taskDto3);
 
         List<TaskDto> actualTaskDtoList = taskService.findAllTasksByUserId(CONSTANT_ID);
 
@@ -155,7 +155,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -199,7 +199,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -211,14 +211,14 @@ public class TaskServiceTest {
         assertTrue(actualTaskDtoList1.isEmpty());
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
     void findAllByUserIdAndStatusTest_UserFound_TaskList() {
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
-        when(taskMapping.toTaskDto(task1)).thenReturn(taskDto1);
-        when(taskMapping.toTaskDto(task2)).thenReturn(taskDto2);
+        when(taskMapper.toTaskDto(task1)).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(task2)).thenReturn(taskDto2);
 
         List<TaskDto> actualTaskDtoList2 = taskService.findAllByUserIdAndStatus(CONSTANT_ID, CONSTANT_TASK_STATUS2);
 
@@ -226,8 +226,8 @@ public class TaskServiceTest {
             assertEquals(CONSTANT_TASK_STATUS2, taskDto.getTaskStatus());
         }
 
-        verify(taskMapping).toTaskDto(task1);
-        verify(taskMapping).toTaskDto(task2);
+        verify(taskMapper).toTaskDto(task1);
+        verify(taskMapper).toTaskDto(task2);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -251,7 +251,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -261,7 +261,7 @@ public class TaskServiceTest {
 
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
         TaskDto actualTaskDto = taskService.changeTaskName(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_NEW_TASK_NAME);
 
@@ -272,7 +272,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository).save(task1);
-        verify(taskMapping).toTaskDto(task1);
+        verify(taskMapper).toTaskDto(task1);
     }
 
     @Test
@@ -282,7 +282,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -296,7 +296,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -306,7 +306,7 @@ public class TaskServiceTest {
 
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
         TaskDto actualTaskDto =
                 taskService.changeTaskDescription(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DESCRIPTION);
@@ -318,7 +318,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository).save(task1);
-        verify(taskMapping).toTaskDto(task1);
+        verify(taskMapper).toTaskDto(task1);
     }
 
     @Test
@@ -328,7 +328,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -342,7 +342,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -351,7 +351,7 @@ public class TaskServiceTest {
 
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
         TaskDto actualTaskDto = taskService.changeTaskStatus(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_STATUS);
 
@@ -362,7 +362,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository).save(task1);
-        verify(taskMapping).toTaskDto(task1);
+        verify(taskMapper).toTaskDto(task1);
     }
 
     @Test
@@ -372,7 +372,7 @@ public class TaskServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.findUserById(CONSTANT_ID));
 
         verify(userService).findUserById(CONSTANT_ID);
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -386,7 +386,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository, never()).save(any());
-        verify(taskMapping, never()).toTaskDto(any());
+        verify(taskMapper, never()).toTaskDto(any());
     }
 
     @Test
@@ -395,7 +395,7 @@ public class TaskServiceTest {
 
         when(userService.findUserById(CONSTANT_ID)).thenReturn(user);
         when(taskRepository.findById(CONSTANT_TASK_ID1)).thenReturn(Optional.of(task1));
-        when(taskMapping.toTaskDto(any(Task.class))).thenReturn(taskDto1);
+        when(taskMapper.toTaskDto(any(Task.class))).thenReturn(taskDto1);
 
         TaskDto actualTaskDto = taskService.changeTaskDeadline(CONSTANT_ID, CONSTANT_TASK_ID1, CONSTANT_TASK_NEW_DEADLINE);
 
@@ -406,7 +406,7 @@ public class TaskServiceTest {
         verify(userService).findUserById(CONSTANT_ID);
         verify(taskRepository).findById(CONSTANT_TASK_ID1);
         verify(taskRepository).save(task1);
-        verify(taskMapping).toTaskDto(task1);
+        verify(taskMapper).toTaskDto(task1);
     }
 
     @Test
