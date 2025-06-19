@@ -10,6 +10,7 @@ import jakarta.validation.constraints.*;
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 @Data
 @NoArgsConstructor
+@NamedEntityGraph(name = "users_entity-graph", attributeNodes = @NamedAttributeNode("taskList"))
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

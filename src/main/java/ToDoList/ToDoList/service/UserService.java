@@ -23,16 +23,13 @@ public class UserService {
 
     @Transactional
     public void deleteUser (Long userId) {
-        userRepository.delete(findUserById(userId));
+        userRepository.delete(userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден")));
     }
 
     @Transactional
-    @Query("SELECT a FROM users a JOIN FETCH a.tasks")
     public UserDto getUser(Long userId) {
-        return userMapping.toUserDto(findUserById(userId));
-    }
-
-    public User findUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        return userMapping.toUserDto(userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден")));
     }
 }
